@@ -13,8 +13,7 @@ if st.button('送出'):
 st.divider()
 st.header("📢 最新公告 ")
 try:
-    conn =
-    psycopg.connect(st.secrets["DATABASE_URL"])
+    conn = psycopg.connect(st.secrets["DATABASE_URL"])
     cursor = conn.cursor()
     cursor.execute("""
         SELECT title, content, created_at
