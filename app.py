@@ -1,4 +1,5 @@
 import streamlit as st
+import psycopg
 
 st.title('Streamlit website test')
 
