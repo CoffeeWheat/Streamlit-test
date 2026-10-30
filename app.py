@@ -17,7 +17,7 @@ try:
     cursor = conn.cursor()
     cursor.execute("""
         SELECT title, content, created_at
-        FROM announcements_announcement
+        FROM announcement_announcement
         ORDER BY created_at DESC
     """)
     announcements = cursor.fetchall()
