@@ -61,10 +61,11 @@ def load_listings():
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(
                 """
-                SELECT id, category, sub, title, price, district, created,
+                SELECT id, category, sub, title, price, district,
+                       created_at AS created,
                        status, seller, description, views
                 FROM postpages_postpage
-                ORDER BY created DESC
+                ORDER BY created_at DESC
                 """
             )
             rows = cursor.fetchall()
