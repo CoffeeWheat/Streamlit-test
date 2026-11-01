@@ -53,7 +53,50 @@ def cname(slug):
         if x["slug"] == slug: return x[field]
     return slug
 def price(v): return t("negotiable") if v is None else f"NT${v:,.0f}"
-def all_listings(): return list(MOCK_LISTINGS) + st.session_state["created"]
+
+@st.cache_data(ttl=60)
+def load_listings():
+    """Load cloud listings in the shape expected by the existing UI."""
+    try:
+        database_url = st.secrets["DATABASE_URL"]
+    except (KeyError, FileNotFoundError):
+        return list(MOCK_LISTINGS)
+
+    import psycopg
+    from psycopg.rows import dict_row
+
+    with psycopg.connect(database_url) as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                """
+                SELECT id, category, sub, title, price, district,
+                       created_at AS created, status, seller, description, views
+                FROM postpages_postpage
+                ORDER BY created_at DESC
+                """
+            )
+            rows = cursor.fetchall()
+
+    return [
+        {
+            "id": str(row["id"]),
+            "category": row["category"],
+            "sub": row["sub"],
+            "title": row["title"],
+            "price": row["price"],
+            "district": row["district"],
+            "created": str(row["created"]),
+            "status": row["status"],
+            "seller": row["seller"] or "",
+            "description": row["description"] or "",
+            "views": row["views"] or 0,
+        }
+        for row in rows
+    ]
+
+
+def all_listings():
+    return load_listings() + st.session_state["created"]
 
 
 def api_base_url():
